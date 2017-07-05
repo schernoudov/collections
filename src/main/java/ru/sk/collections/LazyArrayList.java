@@ -341,7 +341,12 @@ public class LazyArrayList<E>
 
 	@SuppressWarnings("unchecked")
 	E elementData(int index) {
-		return (E) elementData[index] != null ? (E) elementData[index] : factory.call(initialRemoved.nextClearBit(index));
+		
+		int backCardinality = initialRemoved.get(0, index).cardinality();
+		
+		int forwardCardinality = initialRemoved.get(index, (index + backCardinality + 1) < initialRemoved.size() ? (index + backCardinality + 1) : initialRemoved.size() - 1).cardinality();
+		
+		return (E) elementData[index] != null ? (E) elementData[index] : factory.call(backCardinality + forwardCardinality + index);
 	}
 
 	/**

@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.paukov.combinatorics3.Generator;
 
 import javafx.util.Callback;
 
@@ -51,20 +52,59 @@ public class LazyArrayListTest {
 		lazyArrayList.add(2);
 		lazyArrayList.add(4);
 		
+		for (int i = 0; i < LIST_SIZE; i++) {
+			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
+		}
+		
 		Assert.assertEquals(arrayList.get(10), lazyArrayList.get(10));
 		Assert.assertEquals(arrayList.get(11), lazyArrayList.get(11));
+	}
+	
+	@Test
+	public void testSetToList() {
+		
+		arrayList.remove(2);
+		
+		lazyArrayList.remove(2);
+		
+		arrayList.remove(3);
+		
+		lazyArrayList.remove(3);
+		
+		arrayList.remove(8);
+		
+		lazyArrayList.remove(8);
+		
+		arrayList.remove(9);
+		
+		lazyArrayList.remove(9);
+
+		for (int i = 0; i < LIST_SIZE - 2; i++) {
+			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
+		}
 	}
 	
 	@Test
 	public void testRemoveFromList() {
 		
 		arrayList.remove(2);
-		arrayList.remove(4);
 		
 		lazyArrayList.remove(2);
-		lazyArrayList.remove(4);
 		
-		Assert.assertEquals(arrayList.get(3), lazyArrayList.get(3));
-		Assert.assertEquals(arrayList.get(5), lazyArrayList.get(5));
+		arrayList.remove(3);
+		
+		lazyArrayList.remove(3);
+		
+		arrayList.remove(5);
+		
+		lazyArrayList.remove(5);
+		
+		arrayList.remove(6);
+		
+		lazyArrayList.remove(6);
+
+		for (int i = 0; i < LIST_SIZE - 4; i++) {
+			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
+		}
 	}
 }
