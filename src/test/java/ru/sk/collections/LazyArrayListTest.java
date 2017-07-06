@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.paukov.combinatorics3.Generator;
 
 import javafx.util.Callback;
 
@@ -52,34 +51,39 @@ public class LazyArrayListTest {
 		lazyArrayList.add(2);
 		lazyArrayList.add(4);
 		
-		for (int i = 0; i < LIST_SIZE; i++) {
+		for (int i = 0; i < arrayList.size(); i++) {
 			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
 		}
-		
-		Assert.assertEquals(arrayList.get(10), lazyArrayList.get(10));
-		Assert.assertEquals(arrayList.get(11), lazyArrayList.get(11));
 	}
 	
 	@Test
 	public void testSetToList() {
 		
-		arrayList.remove(2);
+		arrayList.set(1, 1);
 		
-		lazyArrayList.remove(2);
+		lazyArrayList.set(1, 1);
 		
-		arrayList.remove(3);
+		arrayList.set(8, 1);
 		
-		lazyArrayList.remove(3);
+		lazyArrayList.set(8, 1);
 		
-		arrayList.remove(8);
+		for (int i = 0; i < arrayList.size(); i++) {
+			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
+		}
+	}
+	
+	@Test
+	public void testInsertToList() {
 		
-		lazyArrayList.remove(8);
+		arrayList.add(1, 1);
 		
-		arrayList.remove(9);
+		lazyArrayList.add(1, 1);
 		
-		lazyArrayList.remove(9);
-
-		for (int i = 0; i < LIST_SIZE - 2; i++) {
+		arrayList.add(8, 1);
+		
+		lazyArrayList.add(8, 1);
+		
+		for (int i = 0; i < arrayList.size(); i++) {
 			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
 		}
 	}
@@ -91,7 +95,11 @@ public class LazyArrayListTest {
 		
 		lazyArrayList.remove(2);
 		
-		arrayList.remove(3);
+		arrayList.remove(2);
+		
+		lazyArrayList.remove(2);
+		
+		/*arrayList.remove(3);
 		
 		lazyArrayList.remove(3);
 		
@@ -101,9 +109,31 @@ public class LazyArrayListTest {
 		
 		arrayList.remove(6);
 		
-		lazyArrayList.remove(6);
+		lazyArrayList.remove(6);*/
 
-		for (int i = 0; i < LIST_SIZE - 4; i++) {
+		for (int i = 0; i < arrayList.size(); i++) {
+			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
+		}
+	}
+	
+	@Test
+	public void testMultipleOperationsOnList() {
+		
+		arrayList.remove(2);
+		arrayList.add(3, 1);
+		arrayList.add(7, 1);
+		arrayList.add(4, 1);
+		arrayList.remove(0);
+		arrayList.remove(4);
+		
+		lazyArrayList.remove(2);
+		lazyArrayList.add(3, 1);
+		lazyArrayList.add(7, 1);
+		lazyArrayList.add(4, 1);
+		lazyArrayList.remove(0);
+		lazyArrayList.remove(4);
+		
+		for (int i = 0; i < arrayList.size(); i++) {
 			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
 		}
 	}

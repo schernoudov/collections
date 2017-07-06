@@ -66,13 +66,11 @@ public class LazyArrayList<E>
 
 	private Comparator<E> comparator;
 
-	private BitSet initialRemoved;
-
-	private int initialSize;
+	private BitSet rightShifts;
+	
+	private BitSet leftShifts;
 
 	public LazyArrayList(Collection<? extends E> collection, int initialSize, Callback<Integer, ? extends E> factory, Comparator<E> comparator) {
-		
-		this.initialSize = initialSize;
 		
 		if (initialSize > 0) {
             this.elementData = new Object[initialSize];
@@ -94,7 +92,8 @@ public class LazyArrayList<E>
 			}
 		}
 		
-		this.initialRemoved = new BitSet(initialSize);
+		this.rightShifts = new BitSet(initialSize);
+		this.leftShifts = new BitSet(initialSize);
 		this.factory = factory;
 		this.comparator = comparator;
 	}
@@ -342,11 +341,11 @@ public class LazyArrayList<E>
 	@SuppressWarnings("unchecked")
 	E elementData(int index) {
 		
-		int backCardinality = initialRemoved.get(0, index).cardinality();
+		int rightShifts = this.rightShifts.get(0, index + 1).cardinality();
 		
-		int forwardCardinality = initialRemoved.get(index, (index + backCardinality + 1) < initialRemoved.size() ? (index + backCardinality + 1) : initialRemoved.size() - 1).cardinality();
+		int leftShifts = this.leftShifts.get(0, index + 1).cardinality();
 		
-		return (E) elementData[index] != null ? (E) elementData[index] : factory.call(backCardinality + forwardCardinality + index);
+		return (E) elementData[index] != null ? (E) elementData[index] : factory.call(rightShifts - leftShifts + index);
 	}
 
 	/**
@@ -422,12 +421,31 @@ public class LazyArrayList<E>
 	 *             {@inheritDoc}
 	 */
 	public void add(int index, E element) {
+		
 		rangeCheckForAdd(index);
 
 		ensureCapacityInternal(size + 1); // Increments modCount!!
+		
 		System.arraycopy(elementData, index, elementData, index + 1, size - index);
+		
 		elementData[index] = element;
+		
+		if (index < rightShifts.size()) {
+			leftShifts.set(index);
+		}
+		
 		size++;
+	}
+	
+	private void shiftRight(BitSet bitSet, int index, int count) {
+		
+		BitSet temp = bitSet.get(index, bitSet.size());
+		
+		bitSet.set(index, index + count, false);
+		
+		for (int i = 0; i < temp.size(); i++) {
+			bitSet.set(index + count + i, temp.get(i));
+		}
 	}
 
 	/**
@@ -454,7 +472,7 @@ public class LazyArrayList<E>
 			System.arraycopy(elementData, index + 1, elementData, index, numMoved);
 		}
 		
-		initialRemoved.set(initialRemoved.get(0, index + 1).cardinality() + index);
+		rightShifts.set(index);
 		
 		elementData[--size] = null; // clear to let GC do its work
 
@@ -504,7 +522,7 @@ public class LazyArrayList<E>
 			System.arraycopy(elementData, index + 1, elementData, index, numMoved);
 		}
 		
-		initialRemoved.set(initialRemoved.nextClearBit(index));
+		rightShifts.set(index);
 		
 		elementData[--size] = null; // clear to let GC do its work
 	}
