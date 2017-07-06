@@ -66,9 +66,9 @@ public class LazyArrayList<E>
 
 	private Comparator<E> comparator;
 
-	private BitSet rightShifts;
+	private int[] rightShifts;
 	
-	private BitSet leftShifts;
+	private int[] leftShifts;
 
 	public LazyArrayList(Collection<? extends E> collection, int initialSize, Callback<Integer, ? extends E> factory, Comparator<E> comparator) {
 		
@@ -92,8 +92,8 @@ public class LazyArrayList<E>
 			}
 		}
 		
-		this.rightShifts = new BitSet(initialSize);
-		this.leftShifts = new BitSet(initialSize);
+		this.rightShifts = new int[0];
+		this.leftShifts = new int[0];
 		this.factory = factory;
 		this.comparator = comparator;
 	}
@@ -341,11 +341,23 @@ public class LazyArrayList<E>
 	@SuppressWarnings("unchecked")
 	E elementData(int index) {
 		
-		int rightShifts = this.rightShifts.get(0, index + 1).cardinality();
+		int rightShiftsCount = 0;
 		
-		int leftShifts = this.leftShifts.get(0, index + 1).cardinality();
+		int loopSize = rightShifts.length <= index ? rightShifts.length : index + 1;
 		
-		return (E) elementData[index] != null ? (E) elementData[index] : factory.call(rightShifts - leftShifts + index);
+		for (int i = 0 ; i < loopSize ; i++) {
+			rightShiftsCount += rightShifts[i];
+		}
+		
+		int leftShiftsCount = 0;
+		
+		loopSize = leftShifts.length <= index ? leftShifts.length : index + 1;
+		
+		for (int i = 0 ; i < loopSize ; i++) {
+			leftShiftsCount += leftShifts[i];
+		}
+		
+		return (E) elementData[index] != null ? (E) elementData[index] : factory.call(rightShiftsCount - leftShiftsCount + index);
 	}
 
 	/**
@@ -430,9 +442,11 @@ public class LazyArrayList<E>
 		
 		elementData[index] = element;
 		
-		if (index < rightShifts.size()) {
-			leftShifts.set(index);
+		if (index > leftShifts.length) {
+			leftShifts = Arrays.copyOf(leftShifts, index + 5);
 		}
+		
+		leftShifts[index] = leftShifts[index] + 1;
 		
 		size++;
 	}
@@ -472,7 +486,7 @@ public class LazyArrayList<E>
 			System.arraycopy(elementData, index + 1, elementData, index, numMoved);
 		}
 		
-		rightShifts.set(index);
+		updateRightShifts(index);
 		
 		elementData[--size] = null; // clear to let GC do its work
 
@@ -522,9 +536,18 @@ public class LazyArrayList<E>
 			System.arraycopy(elementData, index + 1, elementData, index, numMoved);
 		}
 		
-		rightShifts.set(index);
+		updateRightShifts(index);
 		
 		elementData[--size] = null; // clear to let GC do its work
+	}
+
+	private void updateRightShifts(int index) {
+		
+		if (index > rightShifts.length) {
+			rightShifts = Arrays.copyOf(rightShifts, index + 5);
+		}
+		
+		rightShifts[index] = rightShifts[index] + 1;
 	}
 
 	/**

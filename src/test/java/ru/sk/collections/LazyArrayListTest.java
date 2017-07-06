@@ -75,9 +75,9 @@ public class LazyArrayListTest {
 	@Test
 	public void testInsertToList() {
 		
-		arrayList.add(1, 1);
+		arrayList.add(8, 1);
 		
-		lazyArrayList.add(1, 1);
+		lazyArrayList.add(8, 1);
 		
 		arrayList.add(8, 1);
 		
@@ -95,11 +95,7 @@ public class LazyArrayListTest {
 		
 		lazyArrayList.remove(2);
 		
-		arrayList.remove(2);
-		
-		lazyArrayList.remove(2);
-		
-		/*arrayList.remove(3);
+		arrayList.remove(3);
 		
 		lazyArrayList.remove(3);
 		
@@ -109,7 +105,7 @@ public class LazyArrayListTest {
 		
 		arrayList.remove(6);
 		
-		lazyArrayList.remove(6);*/
+		lazyArrayList.remove(6);
 
 		for (int i = 0; i < arrayList.size(); i++) {
 			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
