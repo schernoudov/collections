@@ -547,7 +547,30 @@ public class LazyArrayList<E>
 			rightShifts = Arrays.copyOf(rightShifts, index + 5);
 		}
 		
-		rightShifts[index] = rightShifts[index] + 1;
+		int addition = 0;
+		
+		if (rightShifts[index] != 0) {
+			addition = 1;
+		} else {
+			
+			for (int i = index - 1 ; i > -1 ; i--) {
+				if (rightShifts[i] != 0) {
+					
+					addition = rightShifts[i];
+					
+					break;
+				}
+			}
+		}
+		
+		
+		rightShifts[index] = rightShifts[index] + 1 + addition;
+		
+		for (int i = index + 1; i < rightShifts.length; i++) {
+			if (rightShifts[i] != 0) {
+				rightShifts[i] = rightShifts[i] + 1;
+			}
+		}
 	}
 
 	/**
