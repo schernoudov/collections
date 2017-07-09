@@ -106,6 +106,14 @@ public class LazyArrayListTest {
 		arrayList.remove(6);
 		
 		lazyArrayList.remove(6);
+		
+		arrayList.remove(0);
+		
+		lazyArrayList.remove(0);
+		
+		arrayList.remove(1);
+		
+		lazyArrayList.remove(1);
 
 		for (int i = 0; i < arrayList.size(); i++) {
 			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));

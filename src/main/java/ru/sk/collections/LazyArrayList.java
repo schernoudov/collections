@@ -92,8 +92,8 @@ public class LazyArrayList<E>
 			}
 		}
 		
-		this.rightShifts = new int[0];
-		this.leftShifts = new int[0];
+		this.rightShifts = new int[initialSize];
+		this.leftShifts = new int[initialSize];
 		this.factory = factory;
 		this.comparator = comparator;
 	}
@@ -340,24 +340,38 @@ public class LazyArrayList<E>
 
 	@SuppressWarnings("unchecked")
 	E elementData(int index) {
-		
-		int rightShiftsCount = 0;
-		
-		int loopSize = rightShifts.length <= index ? rightShifts.length : index + 1;
-		
-		for (int i = 0 ; i < loopSize ; i++) {
-			rightShiftsCount += rightShifts[i];
+		if (elementData[index] != null) {
+			return (E) elementData[index];
+		} else {
+			
+			/*int rightShiftsCount = 0;
+			
+			for (int i = index ; i >= 0 && i < rightShifts.length ; i--) {
+				if (rightShifts[i] != 0) {
+					
+					rightShiftsCount = rightShifts[i];
+					
+					break;
+				}
+			}
+			
+			int leftShiftsCount = 0;
+			
+			for (int i = index ; i >= 0 && i < leftShifts.length ; i--) {
+				if (leftShifts[i] != 0) {
+					
+					leftShiftsCount = leftShifts[i];
+					
+					break;
+				}
+			}*/
+			
+			int rightShift = index >= rightShifts.length ? rightShifts[rightShifts.length - 1] : rightShifts[index];
+			
+			int leftShift = index >= leftShifts.length ? leftShifts[leftShifts.length - 1] : leftShifts[index];
+			
+			return factory.call(rightShift - leftShift + index);
 		}
-		
-		int leftShiftsCount = 0;
-		
-		loopSize = leftShifts.length <= index ? leftShifts.length : index + 1;
-		
-		for (int i = 0 ; i < loopSize ; i++) {
-			leftShiftsCount += leftShifts[i];
-		}
-		
-		return (E) elementData[index] != null ? (E) elementData[index] : factory.call(rightShiftsCount - leftShiftsCount + index);
 	}
 
 	/**
@@ -443,10 +457,20 @@ public class LazyArrayList<E>
 		elementData[index] = element;
 		
 		if (index > leftShifts.length) {
-			leftShifts = Arrays.copyOf(leftShifts, index + 5);
+			leftShifts = Arrays.copyOf(leftShifts, index + 1);
 		}
 		
-		leftShifts[index] = leftShifts[index] + 1;
+		for (int i = index; i < leftShifts.length; i++) {
+			leftShifts[i] = leftShifts[i] + 1;
+		}
+		
+		System.out.print("Left shifts: ");
+		
+		for (int i = 0; i < leftShifts.length; i++) {
+			System.out.print(leftShifts[i] + "\t");
+		}
+		
+		System.out.println();
 		
 		size++;
 	}
@@ -543,34 +567,21 @@ public class LazyArrayList<E>
 
 	private void updateRightShifts(int index) {
 		
-		if (index > rightShifts.length) {
-			rightShifts = Arrays.copyOf(rightShifts, index + 5);
-		}
-		
-		int addition = 0;
-		
-		if (rightShifts[index] != 0) {
-			addition = 1;
-		} else {
-			
-			for (int i = index - 1 ; i > -1 ; i--) {
-				if (rightShifts[i] != 0) {
-					
-					addition = rightShifts[i];
-					
-					break;
-				}
-			}
-		}
-		
-		
-		rightShifts[index] = rightShifts[index] + 1 + addition;
+		int[] newRightShifts = Arrays.copyOf(rightShifts, rightShifts.length - 1);
 		
 		for (int i = index + 1; i < rightShifts.length; i++) {
-			if (rightShifts[i] != 0) {
-				rightShifts[i] = rightShifts[i] + 1;
-			}
+			newRightShifts[i - 1] = rightShifts[i] + 1;
 		}
+		
+		rightShifts = newRightShifts;
+		
+		System.out.print("Right shifts: ");
+		
+		for (int i = 0; i < rightShifts.length; i++) {
+			System.out.print(rightShifts[i] + "\t");
+		}
+		
+		System.out.println();
 	}
 
 	/**
