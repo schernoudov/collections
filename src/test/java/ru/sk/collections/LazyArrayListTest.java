@@ -1,6 +1,7 @@
 package ru.sk.collections;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -82,6 +83,22 @@ public class LazyArrayListTest {
 		arrayList.add(8, 1);
 		
 		lazyArrayList.add(8, 1);
+		
+		for (int i = 0; i < arrayList.size(); i++) {
+			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
+		}
+	}
+	
+	@Test
+	public void testInsertAllToList() {
+		
+		arrayList.addAll(8, Arrays.asList(new Integer[] {1, 2, 3}));
+		
+		lazyArrayList.addAll(8, Arrays.asList(new Integer[] {1, 2, 3}));
+		
+		arrayList.addAll(8, Arrays.asList(new Integer[] {1, 2, 3}));
+		
+		lazyArrayList.addAll(8, Arrays.asList(new Integer[] {1, 2, 3}));
 		
 		for (int i = 0; i < arrayList.size(); i++) {
 			Assert.assertEquals(arrayList.get(i), lazyArrayList.get(i));
