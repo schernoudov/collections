@@ -348,7 +348,7 @@ public class LazyArrayList<E>
 			
 			int leftShift = index >= leftShifts.length ? leftShifts[leftShifts.length - 1] : leftShifts[index];
 			
-			return factory.call(rightShift - leftShift + index);
+			return (E) (elementData[index] = factory.call(rightShift - leftShift + index));
 		}
 	}
 
